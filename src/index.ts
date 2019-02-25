@@ -1,23 +1,21 @@
 import "./style.css";
 import * as THREE from "three";
+import EnvironmentService from "./services/environment.service";
+import MaterialService from "./services/material.service";
+import Body from "./models/Body";
+import * as models from "./data/sample-models.json";
 
 // create the scene
-let scene = new THREE.Scene();
+let scene = EnvironmentService.setupNewScene();
 
 // create the camera
-let fieldOfView = 75;
-let aspect = window.innerWidth / window.innerHeight;
-let near = 0.1;
-let far = 1000;
+let camera = EnvironmentService.setupNewPerspectiveCamera();
 
-let camera = new THREE.PerspectiveCamera(
-    fieldOfView, aspect, near, far
-);
+// create controls
+let controls = EnvironmentService.setupOrbitControls(camera);
 
-let renderer = new THREE.WebGLRenderer();
-
-// set size
-renderer.setSize(window.innerWidth, window.innerHeight);
+// setup new renderer
+let renderer = EnvironmentService.setupNewRenderer();
 
 // add canvas to dom
 document.body.appendChild(renderer.domElement);
@@ -25,43 +23,35 @@ document.body.appendChild(renderer.domElement);
 // add axis to the scene
 let axis = new THREE.AxesHelper(10);
 scene.add(axis);
-
+ 
 // add lights
-let color = 0xffffff;
-let intensity = 0.1;
-
-let light = new THREE.DirectionalLight(color, intensity);
-light.position.set(100, 100, 100);
-scene.add(light);
-
-let light2 = new THREE.DirectionalLight(color, intensity);
-light2.position.set(-100, 100, -100);
-scene.add(light2);
-
-// create material 
-let materialColor = 0xaaaaaa;
-let wireframe = true;
-let material = new THREE.MeshBasicMaterial({
-    color: materialColor, wireframe
-});
+EnvironmentService.setupDefaultDirectionalLight(100, 100, 100, scene);
+EnvironmentService.setupDefaultDirectionalLight(-100, 100, -100, scene);
 
 // create a box and add it to the scene
-let box = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), material);
-scene.add(box);
+let body = new Body(scene);
+console.log(models);
+for (let part of models["model1"]) {
+    console.log(part);
+    body.createPart(
+        body.createBoxShape(1, 1, 1),
+        MaterialService.createWireframeMaterial(),
+        part.part
+    );
+    body.updatePartPosition(part.part, "x", part.x);
+    body.updatePartPosition(part.part, "y", part.y);
+}
 
-box.position.x = 0.5;
-box.rotation.y = 0.5;
-
-camera.position.x = 5;
-camera.position.y = 5;
-camera.position.z = 5;
+camera.position.x = 100;
+camera.position.y = 300;
+camera.position.z = 0;
 
 camera.lookAt(scene.position);
 
 function render(): void {
     let timer = 0.002 * Date.now();
-    box.position.y = 0.5 + 0.5 * Math.sin(timer);
-    box.rotation.x += 0.1;
+    // body.updatePartPosition("nose", "y", 0.5 + 0.5 * Math.sin(timer));
+    // body.updatePartRotation("nose", "x", body.getPartRotation("nose", "x") + 0.1);
     renderer.render(scene, camera);
 }
 
