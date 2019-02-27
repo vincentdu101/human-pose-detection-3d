@@ -4,6 +4,12 @@ export interface ICoords {
     x: number, y: number, z: number
 };
 
+export interface IPartDimension {
+    width: number;
+    height: number;
+    depth: number;
+}
+
 export interface IPartsMap {
     nose?: THREE.Mesh
     leftEye?: THREE.Mesh

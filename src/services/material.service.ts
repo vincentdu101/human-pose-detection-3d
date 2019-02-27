@@ -11,4 +11,13 @@ export default class MaterialService {
         });
     }
 
+    public static createCustomColorMaterial(color: string): THREE.Material {
+        // create material 
+        let materialColor = color;
+        let wireframe = false;
+        return new THREE.MeshBasicMaterial({
+            color: materialColor, wireframe
+        });
+    }
+
 }

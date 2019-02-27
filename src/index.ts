@@ -34,7 +34,7 @@ console.log(models);
 for (let part of models["model1"]) {
     console.log(part);
     body.createPart(
-        body.createBoxShape(1, 1, 1),
+        body.createBoxShape(part.part),
         MaterialService.createWireframeMaterial(),
         part.part
     );
@@ -43,7 +43,7 @@ for (let part of models["model1"]) {
 }
 
 camera.position.x = 100;
-camera.position.y = 300;
+camera.position.y = 500;
 camera.position.z = 0;
 
 camera.lookAt(scene.position);

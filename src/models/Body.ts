@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import {ICoords, IPartsMap} from "../interfaces/common.interfaces";
+import * as partDimensions from "../data/part-dimensions.json";
 
 export default class Body {
 
@@ -16,8 +17,9 @@ export default class Body {
         this.parts[name] = part;
     }
 
-    public createBoxShape(width: number, height: number, depth: number): THREE.BoxGeometry {
-        return new THREE.BoxGeometry(width, height, depth);
+    public createBoxShape(part: string): THREE.BoxGeometry {
+        let dim = partDimensions[part];
+        return new THREE.BoxGeometry(dim.width, dim.height, dim.depth);
     }
 
     public updatePartPositions(coords: ICoords, part: string): void {

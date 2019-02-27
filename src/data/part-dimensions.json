@@ -1,0 +1,87 @@
+{
+    "nose": {
+        "width": 10,
+        "height": 20,
+        "depth": 10
+    },
+    "leftEye": {
+        "width": 10,
+        "height": 10,
+        "depth": 10
+    },
+    "rightEye": {
+        "width": 10,
+        "height": 10,
+        "depth": 10
+    },
+    "leftEar": {
+        "width": 10,
+        "height": 20,
+        "depth": 10
+    },
+    "rightEar": {
+        "width": 10,
+        "height": 20,
+        "depth": 10
+    },
+    "leftShoulder": {
+        "width": 50,
+        "height": 30,
+        "depth": 10
+    },
+    "rightShoulder": {
+        "width": 50,
+        "height": 30,
+        "depth": 10
+    },
+    "leftElbow": {
+        "width": 20,
+        "height": 60,
+        "depth": 10
+    },
+    "rightElbow": {
+        "width": 20,
+        "height": 60,
+        "depth": 10
+    },
+    "leftWrist": {
+        "width": 30,
+        "height": 30,
+        "depth": 10
+    },
+    "rightWrist": {
+        "width": 30,
+        "height": 30,
+        "depth": 10
+    },
+    "leftHip": {
+        "width": 20,
+        "height": 50,
+        "depth": 10
+    },
+    "rightHip": {
+        "width": 20,
+        "height": 50,
+        "depth": 10
+    },
+    "leftKnee": {
+        "width": 20,
+        "height": 60,
+        "depth": 10
+    },
+    "rightKnee": {
+        "width": 20,
+        "height": 60,
+        "depth": 10
+    },
+    "leftAnkle": {
+        "width": 20,
+        "height": 30,
+        "depth": 10
+    },
+    "rightAnkle": {
+        "width": 20,
+        "height": 30,
+        "depth": 10
+    }
+}
