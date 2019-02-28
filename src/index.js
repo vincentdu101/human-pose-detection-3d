@@ -4,6 +4,7 @@ import EnvironmentService from "./services/environment.service";
 import MaterialService from "./services/material.service";
 import Body from "./models/Body";
 import * as models from "./data/sample-models.json";
+import * as posenet from "@tensorflow-models/posenet";
 
 // create the scene
 let scene = EnvironmentService.setupNewScene();
@@ -11,11 +12,11 @@ let scene = EnvironmentService.setupNewScene();
 // create the camera
 let camera = EnvironmentService.setupNewPerspectiveCamera();
 
-// create controls
-let controls = EnvironmentService.setupOrbitControls(camera);
-
 // setup new renderer
 let renderer = EnvironmentService.setupNewRenderer();
+
+// create controls
+let controls = EnvironmentService.setupOrbitControls(camera);
 
 // add canvas to dom
 document.body.appendChild(renderer.domElement);
@@ -47,16 +48,18 @@ camera.position.y = 500;
 camera.position.z = 0;
 
 camera.lookAt(scene.position);
+controls.addEventListener("change", render);
 
-function render(): void {
+function render() {
     let timer = 0.002 * Date.now();
     // body.updatePartPosition("nose", "y", 0.5 + 0.5 * Math.sin(timer));
     // body.updatePartRotation("nose", "x", body.getPartRotation("nose", "x") + 0.1);
     renderer.render(scene, camera);
 }
 
-function animate(): void {
+function animate() {
     requestAnimationFrame(animate);
+    controls.update();
     render();
 }
 

@@ -2,7 +2,7 @@ import * as THREE from "three";
 
 export default class MaterialService {
 
-    public static createWireframeMaterial(): THREE.Material {
+    static createWireframeMaterial() {
         // create material 
         let materialColor = 0xaaaaaa;
         let wireframe = true;
@@ -11,7 +11,7 @@ export default class MaterialService {
         });
     }
 
-    public static createCustomColorMaterial(color: string): THREE.Material {
+    static createCustomColorMaterial(color) {
         // create material 
         let materialColor = color;
         let wireframe = false;
