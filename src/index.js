@@ -34,7 +34,8 @@ let axis = new THREE.AxesHelper(10);
 scene.add(axis);
  
 // add lights
-EnvironmentService.setupDefaultDirectionalLight(100, 100, 100, scene);
+scene.add( new THREE.AmbientLight( 0x666666 ) );
+EnvironmentService.setupDefaultDirectionalLight(50, 200, 100, scene);
 EnvironmentService.setupDefaultDirectionalLight(-100, 100, -100, scene);
 
 // create a box and add it to the scene
@@ -52,7 +53,7 @@ for (let part of models["model1"]) {
 }
 
 camera.position.x = 100;
-camera.position.y = 500;
+camera.position.y = 50;
 camera.position.z = 0;
 
 camera.lookAt(scene.position);
