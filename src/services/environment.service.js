@@ -50,4 +50,16 @@ export default class EnvironmentService {
         return controls;
     }
 
+    static setupPlaneGeometry(scene) {
+        let width = 2000;
+        let height = 3000;
+        let widthSegments = 8;
+        let heightSegments = 8;
+        let geometry = new THREE.PlaneBufferGeometry(width, height, widthSegments, heightSegments);
+        let material = new THREE.MeshBasicMaterial({color: 0x000000, side: THREE.DoubleSide});
+        let plane = new THREE.Mesh(geometry, material);
+        plane.position.z = 0;
+        scene.add(plane)
+    }
+
 }
