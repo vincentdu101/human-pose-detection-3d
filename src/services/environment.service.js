@@ -3,6 +3,14 @@ import TrackballControls from "three-trackballcontrols";
 
 export default class EnvironmentService {
 
+    static getWidth() {
+        return 500;
+    }
+
+    static getHeight() {
+        return 300;
+    }
+
     static setupNewScene() {
         // create the scene
         return new THREE.Scene();
@@ -11,7 +19,7 @@ export default class EnvironmentService {
     static setupNewPerspectiveCamera() {
         // create the camera
         let fieldOfView = 75;
-        let aspect = window.innerWidth / window.innerHeight;
+        let aspect = this.getWidth() / this.getHeight();
         let near = 0.1;
         let far = 1000;
 
@@ -25,7 +33,7 @@ export default class EnvironmentService {
         let renderer = new THREE.WebGLRenderer();
 
         // set size
-        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setSize(this.getWidth(), this.getHeight());
         return renderer;
     }
 

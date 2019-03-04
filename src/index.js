@@ -2,6 +2,7 @@ import "./style.css";
 import * as THREE from "three";
 import EnvironmentService from "./services/environment.service";
 import MaterialService from "./services/material.service";
+import VideoService from "./services/video.service";
 import Body from "./models/Body";
 import * as models from "./data/sample-models.json";
 import * as posenet from "@tensorflow-models/posenet";
@@ -17,6 +18,21 @@ let renderer = EnvironmentService.setupNewRenderer();
 
 // create controls
 let controls = EnvironmentService.setupOrbitControls(camera);
+
+let video;
+
+// create video webcam
+try {
+    VideoService.loadVideo().then((loadVideo) => {
+        video = loadVideo;
+    });
+} catch (e) {
+    let info = document.getElementById('info');
+    info.textContent = 'this browser does not support video capture,' +
+      'or this device does not have a camera';
+    info.style.display = 'block';
+    throw e;
+}
 
 // add canvas to dom
 document.body.appendChild(renderer.domElement);
