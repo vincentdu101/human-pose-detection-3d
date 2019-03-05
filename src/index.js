@@ -67,9 +67,9 @@ for (let part of models["model1"]) {
     body.updatePartPosition(part.part, "y", part.y);
 }
 
-camera.position.x = 100;
+camera.position.x = 1000;
 camera.position.y = 50;
-camera.position.z = 0;
+camera.position.z = 1500;
 
 camera.lookAt(scene.position);
 controls.addEventListener("change", render);

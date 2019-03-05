@@ -21,6 +21,15 @@ module.exports = {
                         presets: ["@babel/preset-env"]
                     }
                 }
+            },
+            {
+                test: /\.(png|jpg|gif)$/,
+                use: [
+                    {
+                        loader: "file-loader",
+                        options: {}
+                    }
+                ]
             }
         ]
     },

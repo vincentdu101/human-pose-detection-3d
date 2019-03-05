@@ -1,5 +1,7 @@
 import * as THREE from "three";
 import TrackballControls from "three-trackballcontrols";
+import grass from "../images/grasslight-big.jpg";
+
 // https://threejs.org/examples/#webgl_animation_cloth
 export default class EnvironmentService {
 
@@ -21,10 +23,10 @@ export default class EnvironmentService {
 
     static setupNewPerspectiveCamera() {
         // create the camera
-        let fieldOfView = 75;
+        let fieldOfView = 30;
         let aspect = this.getWidth() / this.getHeight();
-        let near = 0.1;
-        let far = 1000;
+        let near = 1;
+        let far = 10000;
 
         return new THREE.PerspectiveCamera (
             fieldOfView, aspect, near, far
@@ -66,10 +68,18 @@ export default class EnvironmentService {
         let height = 3000;
         let widthSegments = 8;
         let heightSegments = 8;
+        let loader = new THREE.TextureLoader();
+        let groundTexture = loader.load( grass );
+        groundTexture.wrapS = groundTexture.wrapT = THREE.RepeatWrapping;
+        groundTexture.repeat.set( 25, 25 );
+        groundTexture.anisotropy = 16;
+
         let geometry = new THREE.PlaneBufferGeometry(width, height, widthSegments, heightSegments);
-        let material = new THREE.MeshBasicMaterial({color: 0x000000, side: THREE.DoubleSide});
+        let material = new THREE.MeshLambertMaterial({map: groundTexture});
         let plane = new THREE.Mesh(geometry, material);
-        plane.position.y = 0;
+        plane.position.y = -250;
+        plane.rotation.x = Math.PI / 2;
+        plane.receiveShadow = true;
         scene.add(plane);
     }
 
