@@ -1,8 +1,10 @@
+import "babel-polyfill";
 import "./style.css";
 import * as THREE from "three";
 import EnvironmentService from "./services/environment.service";
 import MaterialService from "./services/material.service";
 import VideoService from "./services/video.service";
+import DetectionService from "./services/detection.service";
 import Body from "./models/Body";
 import * as models from "./data/sample-models.json";
 import * as posenet from "@tensorflow-models/posenet";
@@ -75,18 +77,35 @@ camera.lookAt(scene.position);
 controls.addEventListener("change", render);
 document.body.addEventListener("keydown", onKeyDown, false);
 
+async function poseDetectionFrame() {   
+    let state = State.defaultState();
+    let net = await posenet.load();
+    let imageScaleFactor = state.input.imageScaleFactor;
+    let flipHorizontal = true;
+    let outputStride = state.input.outputStride;
+    let pose = await net.estimateSinglePose(
+        video, imageScaleFactor, flipHorizontal, outputStride
+    );
+    console.log("NEW ", pose);
+    requestAnimationFrame(poseDetectionFrame);
+    controls.update();
+    render();
+}
+
+
 function render() {
     let timer = 0.002 * Date.now();
     // body.updatePartPosition("nose", "y", 0.5 + 0.5 * Math.sin(timer));
     // body.updatePartRotation("nose", "x", body.getPartRotation("nose", "x") + 0.1);
+    
     renderer.render(scene, camera);
 }
 
-function animate() {
-    requestAnimationFrame(animate);
-    controls.update();
-    render();
-}
+// function animate() {
+//     requestAnimationFrame(poseDetectionFrame);
+//     controls.update();
+//     render();
+// }
 
 function onKeyDown(event) {
     switch (event.keyCode) {
@@ -106,4 +125,4 @@ function onKeyDown(event) {
     }
 }
 
-animate();
+poseDetectionFrame();

@@ -18,7 +18,7 @@ export default class VideoService {
         if (this.isNavigatorAPINotReady()) {
             throw new Error("Browser API Navigator not ready");
         }
-        debugger;
+
         const video = document.getElementById("video");
         const mobile = UtilityService.isMobile();
         video.width = this.getVideoWidth();
