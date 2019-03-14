@@ -5,6 +5,7 @@ import EnvironmentService from "./services/environment.service";
 import MaterialService from "./services/material.service";
 import VideoService from "./services/video.service";
 import DetectionService from "./services/detection.service";
+import State from "./models/State";
 import Body from "./models/Body";
 import * as models from "./data/sample-models.json";
 import * as posenet from "@tensorflow-models/posenet";
@@ -28,18 +29,6 @@ let controls = EnvironmentService.setupOrbitControls(camera);
 
 let video;
 
-// create video webcam
-try {
-    VideoService.loadVideo().then((loadVideo) => {
-        video = loadVideo;
-    });
-} catch (e) {
-    let info = document.getElementById('info');
-    info.textContent = 'this browser does not support video capture,' +
-      'or this device does not have a camera';
-    info.style.display = 'block';
-    throw e;
-}
 // setup floor 
 EnvironmentService.setupPlaneGeometry(scene);
 
@@ -58,7 +47,7 @@ EnvironmentService.setupDefaultDirectionalLight(-100, 100, -100, scene);
 // create a box and add it to the scene
 let body = new Body(scene);
 console.log(models);
-for (let part of models["model1"]) {
+for (let part of models["default-model"]) {
     console.log(part);
     body.createPart(
         body.createBoxShape(part.part),
@@ -78,18 +67,22 @@ controls.addEventListener("change", render);
 document.body.addEventListener("keydown", onKeyDown, false);
 
 async function poseDetectionFrame() {   
+    let frameDelay = 1000 / 30;
     let state = State.defaultState();
-    let net = await posenet.load();
+    // let net = await posenet.load();
     let imageScaleFactor = state.input.imageScaleFactor;
     let flipHorizontal = true;
     let outputStride = state.input.outputStride;
-    let pose = await net.estimateSinglePose(
-        video, imageScaleFactor, flipHorizontal, outputStride
-    );
-    console.log("NEW ", pose);
-    requestAnimationFrame(poseDetectionFrame);
+    // let pose = await net.estimateSinglePose(
+    //     video, imageScaleFactor, flipHorizontal, outputStride
+    // );
+    // console.log("NEW ", pose);
+    // body.updatePartPositions(pose.keypoints);
     controls.update();
     render();
+    setTimeout(() => {
+        requestAnimationFrame(poseDetectionFrame);
+    }, frameDelay);
 }
 
 
@@ -125,4 +118,16 @@ function onKeyDown(event) {
     }
 }
 
-poseDetectionFrame();
+// create video webcam
+try {
+    VideoService.loadVideo().then((loadVideo) => {
+        video = loadVideo;
+        poseDetectionFrame();
+    });
+} catch (e) {
+    let info = document.getElementById('info');
+    info.textContent = 'this browser does not support video capture,' +
+      'or this device does not have a camera';
+    info.style.display = 'block';
+    throw e;
+}

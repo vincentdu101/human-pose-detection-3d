@@ -77,9 +77,11 @@ export default class EnvironmentService {
         let geometry = new THREE.PlaneBufferGeometry(width, height, widthSegments, heightSegments);
         let material = new THREE.MeshLambertMaterial({map: groundTexture});
         let plane = new THREE.Mesh(geometry, material);
-        plane.position.y = -250;
+        plane.position.y = -320;
+        plane.position.x = 200;
         plane.rotation.x = Math.PI / 2;
-        plane.receiveShadow = true;
+        // plane.receiveShadow = true;
+        window.plane = plane;
         scene.add(plane);
     }
 

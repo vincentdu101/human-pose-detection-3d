@@ -37,6 +37,14 @@ export default class Body {
         this.getPartRotation = (part, positionProp) => {
             return this.parts[part].rotation[positionProp];
         }
+
+        this.updatePartPositions = (parts) => {
+            for (let part of parts) {
+                console.log(part);
+                this.updatePartPosition(part.part, "x", part.position.x);
+                this.updatePartPosition(part.part, "y", part.position.y);
+            }   
+        }
     }
 
 }
