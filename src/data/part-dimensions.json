@@ -66,12 +66,12 @@
     },
     "leftKnee": {
         "width": 20,
-        "height": 60,
+        "height": 80,
         "depth": 10
     },
     "rightKnee": {
         "width": 20,
-        "height": 60,
+        "height": 80,
         "depth": 10
     },
     "leftAnkle": {

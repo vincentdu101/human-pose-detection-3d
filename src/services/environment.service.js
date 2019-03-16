@@ -66,17 +66,21 @@ export default class EnvironmentService {
         return controls;
     }
 
-    static setupPlaneGeometry(scene) {
-        let width = 20000;
-        let height = 20000;
-        let widthSegments = 8;
-        let heightSegments = 8;
+    static setupGroundTexture() {
         let loader = new THREE.TextureLoader();
         let groundTexture = loader.load( grass );
         groundTexture.wrapS = groundTexture.wrapT = THREE.RepeatWrapping;
         groundTexture.repeat.set( 25, 25 );
         groundTexture.anisotropy = 16;
+        return groundTexture;
+    }
 
+    static setupPlaneGeometry(scene) {
+        let width = 20000;
+        let height = 20000;
+        let widthSegments = 8;
+        let heightSegments = 8;
+        let groundTexture = this.setupGroundTexture();
         let geometry = new THREE.PlaneBufferGeometry(width, height, widthSegments, heightSegments);
         let material = new THREE.MeshLambertMaterial({map: groundTexture});
         let plane = new THREE.Mesh(geometry, material);

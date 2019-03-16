@@ -52,7 +52,7 @@ for (let part of models["default-model"]) {
     body.createPart(
         body.createBoxShape(part.part),
         MaterialService.createWireframeMaterial(),
-        part.part
+        part
     );
     body.updatePartPosition(part.part, "x", part.x);
     body.updatePartPosition(part.part, "y", part.y);
@@ -71,15 +71,14 @@ document.body.addEventListener("keydown", onKeyDown, false);
 async function poseDetectionFrame() {   
     let frameDelay = 1000 / 30;
     let state = State.defaultState();
-    // let net = await posenet.load();
+    let net = await posenet.load();
     let imageScaleFactor = state.input.imageScaleFactor;
     let flipHorizontal = true;
     let outputStride = state.input.outputStride;
-    // let pose = await net.estimateSinglePose(
-    //     video, imageScaleFactor, flipHorizontal, outputStride
-    // );
-    // console.log("NEW ", pose);
-    // body.updatePartPositions(pose.keypoints);
+    let pose = await net.estimateSinglePose(
+        video, imageScaleFactor, flipHorizontal, outputStride
+    );
+    body.updatePartPositions(pose.keypoints);
     controls.update();
     render();
     setTimeout(() => {
@@ -90,17 +89,8 @@ async function poseDetectionFrame() {
 
 function render() {
     let timer = 0.002 * Date.now();
-    // body.updatePartPosition("nose", "y", 0.5 + 0.5 * Math.sin(timer));
-    // body.updatePartRotation("nose", "x", body.getPartRotation("nose", "x") + 0.1);
-    
     renderer.render(scene, camera);
 }
-
-// function animate() {
-//     requestAnimationFrame(poseDetectionFrame);
-//     controls.update();
-//     render();
-// }
 
 function onKeyDown(event) {
     switch (event.keyCode) {
@@ -122,10 +112,10 @@ function onKeyDown(event) {
 
 // create video webcam
 try {
-    // VideoService.loadVideo().then((loadVideo) => {
-    //     video = loadVideo;
+    VideoService.loadVideo().then((loadVideo) => {
+        video = loadVideo;
         poseDetectionFrame();
-    // });
+    });
 } catch (e) {
     let info = document.getElementById('info');
     info.textContent = 'this browser does not support video capture,' +
