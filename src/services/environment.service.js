@@ -45,8 +45,9 @@ export default class EnvironmentService {
     static setupDefaultDirectionalLight(x, y, z, scene) {
         let color = 0xdfebff;
         let intensity = 1;
-        let light = new THREE.DirectionalLight(color, intensity);
+        let light = new THREE.HemisphereLight(color, color, intensity);
         light.position.set(x, y, z);
+        window.light = light;
         scene.add(light);
     }
 
@@ -60,12 +61,14 @@ export default class EnvironmentService {
         controls.staticMoving = true;
         controls.dynamicDampingFactor = 0.3;
         controls.keys = [ 65, 83, 68 ];
+        controls.maxDistance = 5000;
+        controls.minDistance = 100;
         return controls;
     }
 
     static setupPlaneGeometry(scene) {
-        let width = 2000;
-        let height = 3000;
+        let width = 20000;
+        let height = 20000;
         let widthSegments = 8;
         let heightSegments = 8;
         let loader = new THREE.TextureLoader();
@@ -77,10 +80,10 @@ export default class EnvironmentService {
         let geometry = new THREE.PlaneBufferGeometry(width, height, widthSegments, heightSegments);
         let material = new THREE.MeshLambertMaterial({map: groundTexture});
         let plane = new THREE.Mesh(geometry, material);
-        plane.position.y = -320;
+        plane.position.y = -350;
         plane.position.x = 200;
-        plane.rotation.x = Math.PI / 2;
-        // plane.receiveShadow = true;
+        plane.rotation.x = -Math.PI / 2;
+        plane.receiveShadow = true;
         window.plane = plane;
         scene.add(plane);
     }

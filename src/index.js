@@ -42,7 +42,7 @@ scene.add(axis);
 // add lights
 scene.add( new THREE.AmbientLight( 0x666666 ) );
 EnvironmentService.setupDefaultDirectionalLight(50, 200, 100, scene);
-EnvironmentService.setupDefaultDirectionalLight(-100, 100, -100, scene);
+EnvironmentService.setupDefaultDirectionalLight(-100, -100, -100, scene);
 
 // create a box and add it to the scene
 let body = new Body(scene);
@@ -57,6 +57,8 @@ for (let part of models["default-model"]) {
     body.updatePartPosition(part.part, "x", part.x);
     body.updatePartPosition(part.part, "y", part.y);
 }
+
+window.body = body;
 
 camera.position.x = 1000;
 camera.position.y = 50;
@@ -120,10 +122,10 @@ function onKeyDown(event) {
 
 // create video webcam
 try {
-    VideoService.loadVideo().then((loadVideo) => {
-        video = loadVideo;
+    // VideoService.loadVideo().then((loadVideo) => {
+    //     video = loadVideo;
         poseDetectionFrame();
-    });
+    // });
 } catch (e) {
     let info = document.getElementById('info');
     info.textContent = 'this browser does not support video capture,' +

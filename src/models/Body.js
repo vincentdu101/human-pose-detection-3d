@@ -42,7 +42,7 @@ export default class Body {
             for (let part of parts) {
                 console.log(part);
                 this.updatePartPosition(part.part, "x", part.position.x);
-                this.updatePartPosition(part.part, "y", part.position.y);
+                this.updatePartPosition(part.part, "y", -part.position.y);
             }   
         }
     }
