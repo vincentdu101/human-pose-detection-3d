@@ -50,7 +50,7 @@ console.log(models);
 for (let part of models["default-model"]) {
     console.log(part);
     body.createPart(
-        body.createBoxShape(part.part),
+        body.createSphereShape(),
         MaterialService.createWireframeMaterial(),
         part
     );
@@ -79,6 +79,7 @@ async function poseDetectionFrame() {
         video, imageScaleFactor, flipHorizontal, outputStride
     );
     body.updatePartPositions(pose.keypoints);
+    body.updateJoints(pose.keypoints, state.singlePoseDetection.minPartConfidence);
     controls.update();
     render();
     setTimeout(() => {
