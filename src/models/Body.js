@@ -1,9 +1,11 @@
 import * as THREE from "three";
 import partDimensions from "../data/part-dimensions.json";
 import * as posenet from "@tensorflow-models/posenet";
-import { drawSegment } from "../../../tfjs-models/posenet/demos/demo_util.js";
 
 export default class Body {
+
+    // x left to right => negative to positive
+    // y up to down => positive to negative
 
     constructor(scene) {
         this.scene = scene;
@@ -63,31 +65,37 @@ export default class Body {
         }
 
         this.drawSegment = (startPoint, endPoint) => {
-            let start = startPoint.position;
-            let end = endPoint.position;
-            if (!this.joints[startPoint.part + "_" + endPoint.part]) {
-                let geometry = new THREE.Geometry();
-                let material = new THREE.LineBasicMaterial({color: 0x0000ff, lineWidth: 10});
-                geometry.vertices.push(new THREE.Vector3(start.x, -start.y, 0));
-                geometry.vertices.push(new THREE.Vector3(end.x, -end.y, 0));
-                let line = new THREE.Line(geometry, material);
-                this.joints[startPoint.part + "_" + endPoint.part] = line;
-                this.scene.add(line);
-            } else {
-                let line = this.joints[startPoint.part + "_" + endPoint.part];
+            let start = this.parts[startPoint];
+            let end = this.parts[endPoint];
+            let geometry = new THREE.Geometry();
+            let material = new THREE.LineBasicMaterial({color: 0x0000ff});
+            geometry.vertices.push(new THREE.Vector3(start.position.x, start.position.y, 0));
+            geometry.vertices.push(new THREE.Vector3(end.position.x, end.position.y, 0));
+            let line = new THREE.Line(geometry, material);
+            this.joints[startPoint + "_" + endPoint] = line;
+            window.joints = this.joints;
+            this.scene.add(line);
+        }
+
+        this.updateSegment = (startPoint, endPoint) => {
+            let start = this.parts[startPoint];
+            let end = this.parts[endPoint];
+            let line = this.joints[startPoint + "_" + endPoint];
+            if (!!line) {
                 line.geometry.vertices = [];
-                line.geometry.vertices.push(new THREE.Vector3(start.x, -start.y, 0));
-                line.geometry.vertices.push(new THREE.Vector3(end.x, -end.y, 0));
+                line.geometry.vertices.push(new THREE.Vector3(start.position.x, start.position.y, 0));
+                line.geometry.vertices.push(new THREE.Vector3(end.position.x, end.position.y, 0));
+
             }
         }
 
-        this.updateJoints = (keypoints, minConfidence) => {
-            const adjacentKeyPoints = posenet.getAdjacentKeyPoints(keypoints, minConfidence);
-        
-            adjacentKeyPoints.forEach((keypoints) => {
-                console.log(keypoints);
-                this.drawSegment(keypoints[0], keypoints[1]);
-            });
+        this.updateJoints = () => {
+            let joints = Object.keys(this.joints);
+            for (let joint of joints) {
+                let start = joint.split("_")[0];
+                let end = joint.split("_")[0];
+                this.updateSegment(start, end);
+            }
         }
     }
 

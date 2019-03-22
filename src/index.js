@@ -58,6 +58,11 @@ for (let part of models["default-model"]) {
     body.updatePartPosition(part.part, "y", part.y);
 }
 
+for (let joint of models["default-joints"]) {
+    console.log(joint);
+    body.drawSegment(joint.start, joint.end);
+}
+
 window.body = body;
 
 camera.position.x = 1000;
@@ -79,7 +84,7 @@ async function poseDetectionFrame() {
         video, imageScaleFactor, flipHorizontal, outputStride
     );
     body.updatePartPositions(pose.keypoints);
-    body.updateJoints(pose.keypoints, state.singlePoseDetection.minPartConfidence);
+    body.updateJoints();
     controls.update();
     render();
     setTimeout(() => {
