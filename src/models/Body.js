@@ -33,7 +33,7 @@ export default class Body {
         }
     
         this.updatePartPositions = (coords, part) => {
-            this.parts[part].position = coords;
+            this.parts[part].position.set(coords);
         }
     
         this.updatePartPosition = (part, positionProp, position) => {
@@ -52,7 +52,7 @@ export default class Body {
             return this.parts[part].rotation[positionProp];
         }
 
-        this.updatePartPositions = (parts) => {
+        this.updatePartsPositions = (parts) => {
             for (let part of parts) {
                 if (part.score > 0.95) {
                     this.updatePartPosition(part.part, "x", part.position.x);
@@ -71,6 +71,7 @@ export default class Body {
             let material = new THREE.LineBasicMaterial({color: 0x0000ff});
             geometry.vertices.push(new THREE.Vector3(start.position.x, start.position.y, 0));
             geometry.vertices.push(new THREE.Vector3(end.position.x, end.position.y, 0));
+            geometry.verticesNeedUpdate = true;
             let line = new THREE.Line(geometry, material);
             this.joints[startPoint + "_" + endPoint] = line;
             window.joints = this.joints;
@@ -78,24 +79,39 @@ export default class Body {
         }
 
         this.updateSegment = (startPoint, endPoint) => {
-            let start = this.parts[startPoint];
-            let end = this.parts[endPoint];
-            let line = this.joints[startPoint + "_" + endPoint];
-            if (!!line) {
-                line.geometry.vertices = [];
-                line.geometry.vertices.push(new THREE.Vector3(start.position.x, start.position.y, 0));
-                line.geometry.vertices.push(new THREE.Vector3(end.position.x, end.position.y, 0));
+            let start = startPoint;
+            let end = endPoint;
+            let line = this.joints[startPoint.part + "_" + endPoint.part];
+            let reverseLine = this.joints[endPoint.part + "_" + startPoint.part];
+            let tempLine = line || reverseLine;
+            console.log(tempLine);
+            console.log(start);
+            console.log(end);
+            if (!!tempLine) {
+                tempLine.geometry.vertices = [];
+                tempLine.geometry.vertices.push(new THREE.Vector3(start.position.x, start.position.y, 0));
+                tempLine.geometry.vertices.push(new THREE.Vector3(end.position.x, end.position.y, 0));
+                tempLine.geometry.verticesNeedUpdate = true;
+            }
 
+            if (!!line) {
+                this.joints[startPoint.part + "_" + endPoint.part] = tempLine;
+            } else {
+                this.joints[endPoint.part + "_" + startPoint.part] = tempLine;
             }
         }
 
-        this.updateJoints = () => {
-            let joints = Object.keys(this.joints);
-            for (let joint of joints) {
-                let start = joint.split("_")[0];
-                let end = joint.split("_")[0];
+        this.updateJoints = (pose, minConfidence) => {
+            const adjKeyPoints = posenet.getAdjacentKeyPoints(pose.keypoints, minConfidence);
+            adjKeyPoints.forEach((keypoints) => {
+                let start = keypoints[0];
+                let end = keypoints[1];
+                start.position.y = -start.position.y;
+                end.position.y = -end.position.y;
                 this.updateSegment(start, end);
-            }
+                this.updatePartPositions(start.position, start.part);
+                this.updatePartPositions(end.position, end.part);
+            });
         }
     }
 

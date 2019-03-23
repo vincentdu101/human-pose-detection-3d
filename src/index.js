@@ -46,9 +46,7 @@ EnvironmentService.setupDefaultDirectionalLight(-100, -100, -100, scene);
 
 // create a box and add it to the scene
 let body = new Body(scene);
-console.log(models);
 for (let part of models["default-model"]) {
-    console.log(part);
     body.createPart(
         body.createSphereShape(),
         MaterialService.createWireframeMaterial(),
@@ -59,7 +57,6 @@ for (let part of models["default-model"]) {
 }
 
 for (let joint of models["default-joints"]) {
-    console.log(joint);
     body.drawSegment(joint.start, joint.end);
 }
 
@@ -83,8 +80,8 @@ async function poseDetectionFrame() {
     let pose = await net.estimateSinglePose(
         video, imageScaleFactor, flipHorizontal, outputStride
     );
-    body.updatePartPositions(pose.keypoints);
-    body.updateJoints();
+    body.updatePartsPositions(pose.keypoints);
+    body.updateJoints(pose, state.singlePoseDetection.minPartConfidence);
     controls.update();
     render();
     setTimeout(() => {
