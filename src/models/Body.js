@@ -1,6 +1,8 @@
 import * as THREE from "three";
 import partDimensions from "../data/part-dimensions.json";
 import * as posenet from "@tensorflow-models/posenet";
+import * as models from "../data/sample-models.json";
+import { join } from "upath";
 
 export default class Body {
 
@@ -54,14 +56,23 @@ export default class Body {
 
         this.updatePartsPositions = (parts) => {
             for (let part of parts) {
-                if (part.score > 0.95) {
+                if (part.score > 0.5) {
                     this.updatePartPosition(part.part, "x", part.position.x);
                     this.updatePartPosition(part.part, "y", -part.position.y);
-                } else {
-                    this.updatePartPosition(part.part, "x", this.default[part.part].x);
-                    this.updatePartPosition(part.part, "y", this.default[part.part].y);
                 }
             }   
+        }
+
+        this.resetSegments = () => {
+            for (let joint of models["default-joints"]) {
+                this.drawSegment(joint.start, joint.end);
+            }
+        }
+
+        this.updateSegmentToDefault = () => {
+            for (let joint of models["default-joints"]) {
+                this.updateSegment(this.default[joint.start], this.default[joint.end]);
+            }
         }
 
         this.drawSegment = (startPoint, endPoint) => {
@@ -84,9 +95,7 @@ export default class Body {
             let line = this.joints[startPoint.part + "_" + endPoint.part];
             let reverseLine = this.joints[endPoint.part + "_" + startPoint.part];
             let tempLine = line || reverseLine;
-            console.log(tempLine);
-            console.log(start);
-            console.log(end);
+ 
             if (!!tempLine) {
                 tempLine.geometry.vertices = [];
                 tempLine.geometry.vertices.push(new THREE.Vector3(start.position.x, start.position.y, 0));
@@ -96,22 +105,23 @@ export default class Body {
 
             if (!!line) {
                 this.joints[startPoint.part + "_" + endPoint.part] = tempLine;
-            } else {
-                this.joints[endPoint.part + "_" + startPoint.part] = tempLine;
             }
         }
 
         this.updateJoints = (pose, minConfidence) => {
-            const adjKeyPoints = posenet.getAdjacentKeyPoints(pose.keypoints, minConfidence);
-            adjKeyPoints.forEach((keypoints) => {
-                let start = keypoints[0];
-                let end = keypoints[1];
-                start.position.y = -start.position.y;
-                end.position.y = -end.position.y;
-                this.updateSegment(start, end);
-                this.updatePartPositions(start.position, start.part);
-                this.updatePartPositions(end.position, end.part);
-            });
+            for (let joint of models["default-joints"]) {
+                let start = this.parts[joint.start];
+                let end = this.parts[joint.end];
+                let line = this.joints[joint.start + "_" + joint.end];
+     
+                if (!!line) {
+                    line.geometry.vertices = [];
+                    line.geometry.vertices.push(new THREE.Vector3(start.position.x, start.position.y, 0));
+                    line.geometry.vertices.push(new THREE.Vector3(end.position.x, end.position.y, 0));
+                    line.geometry.verticesNeedUpdate = true;
+                    this.joints[joint.start + "_" + joint.end] = line;
+                }
+            }
         }
     }
 

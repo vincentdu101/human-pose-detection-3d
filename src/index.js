@@ -49,17 +49,14 @@ let body = new Body(scene);
 for (let part of models["default-model"]) {
     body.createPart(
         body.createSphereShape(),
-        MaterialService.createWireframeMaterial(),
+        MaterialService.createCustomColorMaterial(part.color),
         part
     );
     body.updatePartPosition(part.part, "x", part.x);
     body.updatePartPosition(part.part, "y", part.y);
 }
 
-for (let joint of models["default-joints"]) {
-    body.drawSegment(joint.start, joint.end);
-}
-
+body.resetSegments();
 window.body = body;
 
 camera.position.x = 1000;
