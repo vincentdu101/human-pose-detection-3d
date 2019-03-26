@@ -79,7 +79,7 @@ async function poseDetectionFrame() {
     );
     body.updatePartsPositions(pose.keypoints);
     body.updateJoints(pose, state.singlePoseDetection.minPartConfidence);
-    DetectionService.outputPoseInVideo(pose);
+    DetectionService.outputPoseInVideo(pose, video);
     controls.update();
     render();
     setTimeout(() => {

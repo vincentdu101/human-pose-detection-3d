@@ -1,10 +1,15 @@
 import * as posenet from "@tensorflow-models/posenet";
 import State from "../models/State";
 import VideoService from "./video.service";
+import * as d3 from "d3";
 
 const color = "aqua";
 const scale = 1;
 const lineWidth = 2;
+const state = State.defaultState();
+const width = VideoService.getVideoWidth();
+const height = VideoService.getVideoHeight();
+const margin = {top: 10, right: 10, bottom: 30, left: 30};
 
 function toTuple({y, x}) {
     return [y, x];
@@ -50,29 +55,89 @@ export default class DetectionService {
             this.drawKeypoints(context, y * scale, x * scale, 3, color);
         }
     }
- 
-    static outputPoseInVideo(pose) {
-        const state = State.defaultState();
 
-        // get canvas and context
-        const canvas = document.getElementById("output");
-        const context = canvas.getContext("2d");
-
-        canvas.width = VideoService.getVideoWidth();
-        canvas.height = VideoService.getVideoHeight();
-
-        context.clearRect(0, 0, canvas.width, canvas.height);
-        context.save();
-        context.scale(-1, 1);
-        context.translate(-canvas.width, 0);
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
-        context.restore();
-        
+    static drawPose(pose, context) {
         if (pose.score >= state.singlePoseDetection.minPoseConfidence) {
             let minPartConfidence = state.singlePoseDetection.minPartConfidence;
             this.drawKeypoints(pose.keypoints, minPartConfidence, context);
             this.drawSkeleton(pose.keypoints, minPartConfidence, context);
         }
+    }
+
+    static updateContext(context, video) {
+        context.clearRect(0, 0, width, height);
+        context.save();
+        context.scale(-1, 1);
+        context.translate(-width, 0);
+        
+        if (!!video) {
+            context.drawImage(video, 0, 0, width, height);
+        }
+        context.restore();
+   
+    }
+
+    static drawAxes() {
+        let svg = d3.select("#skeleton-axes")
+                    .attr("width", width - 1)
+                    .attr("height", height - 1)
+                    .append("g")
+                    .style("transform", "translate(" + margin.left + ", " + margin.top + ")");
+    
+        let xScale = d3.scaleLinear()
+            .domain([-500, 500])
+            .range([0, width]);
+
+        let yScale = d3.scaleLinear() 
+            .domain([300, -300])
+            .range([height, 0]);
+
+        let xAxis = d3.axisBottom(xScale)
+            .ticks(20);
+
+        let yAxis = d3.axisLeft(yScale)
+            .ticks(20);
+
+        let xAxisSvg = svg.append("g")
+            .attr("class", "x-axis")
+            .attr("transform", "translate(0, " + height + ")")
+            .call(xAxis);
+
+        let yAxisSvg = svg.append("g")
+            .attr("class", "y-axis")
+            .call(yAxis);
+
+    }
+
+    static outputPureSkeleton(pose) {
+        // get canvas and context
+        const canvas = document.getElementById("skeleton-output");
+        const context = canvas.getContext("2d");
+
+        canvas.width = width;
+        canvas.height = height;
+        
+        this.updateContext(context);
+        this.drawPose(pose, context);
+
+        this.drawAxes();
+    }
+
+    static outputVideoSkeleton(pose, video) {
+        // get canvas and context
+        const canvas = document.getElementById("output");
+        const context = canvas.getContext("2d");
+
+        canvas.width = width;
+        canvas.height = height;
+
+        this.updateContext(context, video);
+        this.drawPose(pose, context);
+    }
+ 
+    static outputPoseInVideo(pose, video) {
+        this.outputPureSkeleton(pose);
+        this.outputVideoSkeleton(pose, video);
     }
 
 }
