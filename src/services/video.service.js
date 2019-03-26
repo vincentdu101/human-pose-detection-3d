@@ -3,7 +3,7 @@ import UtilityService from "../services/utility.service";
 export default class VideoService {
 
     static getVideoWidth() {
-        return 400;
+        return 500;
     }
 
     static getVideoHeight() {
@@ -18,7 +18,7 @@ export default class VideoService {
         if (this.isNavigatorAPINotReady()) {
             throw new Error("Browser API Navigator not ready");
         }
-
+        
         const video = document.getElementById("video");
         const mobile = UtilityService.isMobile();
         video.width = this.getVideoWidth();

@@ -33,7 +33,7 @@ let video;
 EnvironmentService.setupPlaneGeometry(scene);
 
 // add canvas to dom
-document.body.appendChild(renderer.domElement);
+document.getElementById("world").appendChild(renderer.domElement);
 
 // add axis to the scene
 let axis = new THREE.AxesHelper(10);
@@ -79,6 +79,7 @@ async function poseDetectionFrame() {
     );
     body.updatePartsPositions(pose.keypoints);
     body.updateJoints(pose, state.singlePoseDetection.minPartConfidence);
+    DetectionService.outputPoseInVideo(pose);
     controls.update();
     render();
     setTimeout(() => {

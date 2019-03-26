@@ -93,17 +93,12 @@ export default class Body {
             let start = startPoint;
             let end = endPoint;
             let line = this.joints[startPoint.part + "_" + endPoint.part];
-            let reverseLine = this.joints[endPoint.part + "_" + startPoint.part];
-            let tempLine = line || reverseLine;
  
-            if (!!tempLine) {
-                tempLine.geometry.vertices = [];
-                tempLine.geometry.vertices.push(new THREE.Vector3(start.position.x, start.position.y, 0));
-                tempLine.geometry.vertices.push(new THREE.Vector3(end.position.x, end.position.y, 0));
-                tempLine.geometry.verticesNeedUpdate = true;
-            }
-
             if (!!line) {
+                line.geometry.vertices = [];
+                line.geometry.vertices.push(new THREE.Vector3(start.position.x, start.position.y, 0));
+                line.geometry.vertices.push(new THREE.Vector3(end.position.x, end.position.y, 0));
+                line.geometry.verticesNeedUpdate = true;
                 this.joints[startPoint.part + "_" + endPoint.part] = tempLine;
             }
         }
