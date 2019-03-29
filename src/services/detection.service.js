@@ -9,7 +9,7 @@ const lineWidth = 2;
 const state = State.defaultState();
 const width = VideoService.getVideoWidth();
 const height = VideoService.getVideoHeight();
-const margin = {top: 10, right: 10, bottom: 30, left: 30};
+const margin = {top: 20, right: 10, bottom: 30, left: 30};
 
 function toTuple({y, x}) {
     return [y, x];
@@ -85,26 +85,29 @@ export default class DetectionService {
                     .style("transform", "translate(" + margin.left + ", " + margin.top + ")");
     
         let xScale = d3.scaleLinear()
-            .domain([-500, 500])
+            .domain([0, 300])
             .range([0, width]);
 
         let yScale = d3.scaleLinear() 
-            .domain([300, -300])
+            .domain([0, 300])
             .range([height, 0]);
 
         let xAxis = d3.axisBottom(xScale)
-            .ticks(20);
+            .ticks(20)
+            .tickSize(-width);
 
         let yAxis = d3.axisLeft(yScale)
-            .ticks(20);
+            .ticks(20)
+            .tickSize(-height * 2);
 
         let xAxisSvg = svg.append("g")
-            .attr("class", "x-axis")
-            .attr("transform", "translate(0, " + height + ")")
+            .attr("class", "x-axis grid")
+            .attr("transform", "translate(0, " + (height - margin.bottom)  + ")")
             .call(xAxis);
 
         let yAxisSvg = svg.append("g")
-            .attr("class", "y-axis")
+            .attr("class", "y-axis grid")
+            .attr("transform", "translate(" + margin.left + ", 0)")
             .call(yAxis);
 
     }
