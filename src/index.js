@@ -5,6 +5,7 @@ import EnvironmentService from "./services/environment.service";
 import MaterialService from "./services/material.service";
 import VideoService from "./services/video.service";
 import DetectionService from "./services/detection.service";
+import BarService from "./services/bar.service";
 import State from "./models/State";
 import Body from "./models/Body";
 import * as models from "./data/sample-models.json";
@@ -80,6 +81,7 @@ async function poseDetectionFrame() {
     body.updatePartsPositions(pose.keypoints);
     body.updateJoints(pose, state.singlePoseDetection.minPartConfidence);
     DetectionService.outputPoseInVideo(pose, video);
+    BarService.createBarChart(pose.keypoints);
     controls.update();
     render();
     setTimeout(() => {
