@@ -21,7 +21,7 @@ export default class BarService {
     static getYScaleLinear(data) {
         return d3.scaleBand()
                 .domain(data.map(d => d.part))
-                .range([margin.top, this.determineHeight() - margin.bottom])
+                .range([margin.top, this.determineHeight(data) - margin.bottom])
                 .padding(0.1);
     }
 
