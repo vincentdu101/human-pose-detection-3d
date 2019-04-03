@@ -1,11 +1,13 @@
 import "babel-polyfill";
 import "./style.css";
+import "bootstrap/dist/css/bootstrap.css";
 import * as THREE from "three";
 import EnvironmentService from "./services/environment.service";
 import MaterialService from "./services/material.service";
 import VideoService from "./services/video.service";
 import DetectionService from "./services/detection.service";
 import BarService from "./services/bar.service";
+import VisorService from "./services/visor.service";
 import State from "./models/State";
 import Body from "./models/Body";
 import * as models from "./data/sample-models.json";
@@ -59,6 +61,7 @@ for (let part of models["default-model"]) {
 
 body.resetSegments();
 window.body = body;
+VisorService.setupVisor();
 
 camera.position.x = 1000;
 camera.position.y = 50;
@@ -75,6 +78,7 @@ async function poseDetectionFrame() {
     let imageScaleFactor = state.input.imageScaleFactor;
     let flipHorizontal = true;
     let outputStride = state.input.outputStride;
+    
     let pose = await net.estimateSinglePose(
         video, imageScaleFactor, flipHorizontal, outputStride
     );

@@ -1,7 +1,7 @@
 import * as d3 from "d3";
 
 const width = 900;
-const margin = {top: 30, right: 0, bottom: 10, left: 50};
+const margin = {top: 30, right: 0, bottom: 10, left: 70};
 
 export default class BarService {
 
