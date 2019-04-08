@@ -11,6 +11,8 @@ const width = VideoService.getVideoWidth();
 const height = VideoService.getVideoHeight();
 const margin = {top: 20, right: 10, bottom: 30, left: 30};
 
+let detectionType = "webcam";
+
 function toTuple({y, x}) {
     return [y, x];
 }
@@ -141,6 +143,10 @@ export default class DetectionService {
     static outputPoseInVideo(pose, video) {
         this.outputPureSkeleton(pose);
         this.outputVideoSkeleton(pose, video);
+    }
+
+    static isWebCamDetection() {
+        return sessionStorage.getItem("detection-type") === "webcam";
     }
 
 }

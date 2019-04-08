@@ -78,10 +78,12 @@ async function poseDetectionFrame() {
     let imageScaleFactor = state.input.imageScaleFactor;
     let flipHorizontal = true;
     let outputStride = state.input.outputStride;
-    
+    let videoSource = DetectionService.isWebCamDetection() ? video : undefined;
+
     let pose = await net.estimateSinglePose(
-        video, imageScaleFactor, flipHorizontal, outputStride
+        videoSource, imageScaleFactor, flipHorizontal, outputStride
     );
+    
     body.updatePartsPositions(pose.keypoints);
     body.updateJoints(pose, state.singlePoseDetection.minPartConfidence);
     DetectionService.outputPoseInVideo(pose, video);
