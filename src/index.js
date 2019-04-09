@@ -12,6 +12,7 @@ import State from "./models/State";
 import Body from "./models/Body";
 import * as models from "./data/sample-models.json";
 import * as posenet from "@tensorflow-models/posenet";
+import testVideoSrc from "./videos/dance.mp4"; 
 
 let upKey = 83;
 let downKey = 87;
@@ -30,6 +31,7 @@ let renderer = EnvironmentService.setupNewRenderer();
 // create controls
 let controls = EnvironmentService.setupOrbitControls(camera);
 
+let testVideo;
 let video;
 
 // setup floor 
@@ -78,7 +80,12 @@ async function poseDetectionFrame() {
     let imageScaleFactor = state.input.imageScaleFactor;
     let flipHorizontal = true;
     let outputStride = state.input.outputStride;
-    let videoSource = DetectionService.isWebCamDetection() ? video : undefined;
+    let videoSource = video;
+    
+    if (!DetectionService.isWebCamDetection()) {
+        videoSource = testVideo;
+        testVideo.play();
+    }
 
     let pose = await net.estimateSinglePose(
         videoSource, imageScaleFactor, flipHorizontal, outputStride
@@ -121,14 +128,11 @@ function onKeyDown(event) {
 
 // create video webcam
 try {
-    VideoService.loadVideo().then((loadVideo) => {
-        video = loadVideo;
+    Promise.all([VideoService.loadWebcam(), VideoService.loadVideo()]).then((videos) => {
+        video = videos[0];
+        testVideo = videos[1];
         poseDetectionFrame();
     });
 } catch (e) {
-    let info = document.getElementById('info');
-    info.textContent = 'this browser does not support video capture,' +
-      'or this device does not have a camera';
-    info.style.display = 'block';
     throw e;
 }

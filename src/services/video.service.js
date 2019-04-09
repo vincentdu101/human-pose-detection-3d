@@ -44,12 +44,32 @@ export default class VideoService {
         });
     }
 
-    static loadVideo() {
+    static setupVideo() {
+        const video = document.getElementById("video-test-source");
+        video.width = this.getVideoWidth();
+        video.height = this.getVideoHeight();
+
+        return new Promise((resolve) => {
+            video.onloadedmetadata = () => {
+                resolve(video);
+            }
+        });
+    }
+
+    static loadWebcam() {
         return new Promise((resolve) => {
             this.setupCamera().then((video) => {
                 video.play();
                 return resolve(video);
             }); 
+        });
+    }
+
+    static loadVideo() {
+        return new Promise((resolve) => {
+            this.setupVideo().then((video) => {
+                return resolve(video);
+            });
         });
     }
 
