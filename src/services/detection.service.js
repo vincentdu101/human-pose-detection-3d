@@ -80,7 +80,8 @@ export default class DetectionService {
     }
 
     static drawAxes() {
-        let svg = d3.select("#skeleton-axes")
+        let axes = this.isWebCamDetection() ? "#skeleton-axes" : "#skeleton-test-axes";
+        let svg = d3.select(axes)
                     .attr("width", width - 1)
                     .attr("height", height - 1)
                     .append("g")
@@ -114,9 +115,9 @@ export default class DetectionService {
 
     }
 
-    static outputPureSkeleton(pose) {
+    static outputPureSkeleton(pose, output) {
         // get canvas and context
-        const canvas = document.getElementById("skeleton-output");
+        const canvas = document.getElementById(output);
         const context = canvas.getContext("2d");
 
         canvas.width = width;
@@ -128,9 +129,9 @@ export default class DetectionService {
         this.drawAxes();
     }
 
-    static outputVideoSkeleton(pose, video) {
+    static outputVideoSkeleton(pose, video, output) {
         // get canvas and context
-        const canvas = document.getElementById("output");
+        const canvas = document.getElementById(output);
         const context = canvas.getContext("2d");
 
         canvas.width = width;
@@ -139,10 +140,31 @@ export default class DetectionService {
         this.updateContext(context, video);
         this.drawPose(pose, context);
     }
+
+    static outputVideoBasedSkeleton(keypoints, output, scale = 1) {
+        const canvas = document.getElementById(output);
+        const context = canvas.getContext("2d");
+
+        const adjKeyPoints = posenet.getAdjacentKeyPoints(keypoints, state.singlePoseDetection.minPartConfidence);
+        adjKeyPoints.forEach((keypoints) => {
+            this.drawSegment(
+                toTuple(keypoints[0].position), 
+                toTuple(keypoints[1].position), 
+                "aqua", 
+                scale, 
+                context
+            );
+        });
+    }
  
     static outputPoseInVideo(pose, video) {
-        this.outputPureSkeleton(pose);
-        this.outputVideoSkeleton(pose, video);
+        if (this.isWebCamDetection()) {
+            this.outputPureSkeleton(pose, "skeleton-output");
+            this.outputVideoSkeleton(pose, video, "webcam-output");   
+        } else {
+            this.outputVideoSkeleton(pose, video, "video-test-output");             
+            this.outputVideoBasedSkeleton(pose.keypoints, "video-test-output");
+        }
     }
 
     static isWebCamDetection() {

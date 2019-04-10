@@ -93,7 +93,7 @@ async function poseDetectionFrame() {
     
     body.updatePartsPositions(pose.keypoints);
     body.updateJoints(pose, state.singlePoseDetection.minPartConfidence);
-    DetectionService.outputPoseInVideo(pose, video);
+    DetectionService.outputPoseInVideo(pose, videoSource);
     BarService.createBarChart(pose.keypoints);
     controls.update();
     render();
