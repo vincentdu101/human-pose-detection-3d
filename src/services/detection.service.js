@@ -45,7 +45,7 @@ export default class DetectionService {
         });
     }
 
-    static drawKeypoints(keypoints, minPartConfidence, context) {
+    static drawKeypoints(keypoints, minPartConfidence, ctx) {
         for (let i = 0; i < keypoints.length; i++) {
             const keypoint = keypoints[i];
 
@@ -54,7 +54,7 @@ export default class DetectionService {
             }
 
             const {y, x} = keypoint.position;
-            this.drawKeypoints(context, y * scale, x * scale, 3, color);
+            this.drawPoint(ctx, y * scale, x * scale, 3, color);
         }
     }
 
@@ -146,6 +146,7 @@ export default class DetectionService {
         const context = canvas.getContext("2d");
 
         const adjKeyPoints = posenet.getAdjacentKeyPoints(keypoints, state.singlePoseDetection.minPartConfidence);
+        
         adjKeyPoints.forEach((keypoints) => {
             this.drawSegment(
                 toTuple(keypoints[0].position), 
@@ -162,8 +163,13 @@ export default class DetectionService {
             this.outputPureSkeleton(pose, "skeleton-output");
             this.outputVideoSkeleton(pose, video, "webcam-output");   
         } else {
-            this.outputVideoSkeleton(pose, video, "video-test-output");             
-            this.outputVideoBasedSkeleton(pose.keypoints, "video-test-output");
+            const videoTest = "video-test-output";
+            const canvas = document.getElementById(videoTest);
+            const ctx = canvas.getContext("2d");
+
+            this.drawKeypoints(pose.keypoints, state.singlePoseDetection.minPartConfidence, ctx);
+            this.outputVideoSkeleton(pose, video, videoTest);             
+            this.outputVideoBasedSkeleton(pose.keypoints, videoTest);
         }
     }
 

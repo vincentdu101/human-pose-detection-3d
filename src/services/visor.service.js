@@ -44,4 +44,8 @@ export default class VisorService {
         });
     }
 
+    static showConfusion(keypoints) {
+        
+    }
+
 }

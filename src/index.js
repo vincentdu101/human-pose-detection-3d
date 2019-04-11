@@ -12,7 +12,7 @@ import State from "./models/State";
 import Body from "./models/Body";
 import * as models from "./data/sample-models.json";
 import * as posenet from "@tensorflow-models/posenet";
-import testVideoSrc from "./videos/dance.mp4"; 
+import testVideoSrc from "./videos/photographer.mp4"; 
 
 let upKey = 83;
 let downKey = 87;
@@ -95,6 +95,11 @@ async function poseDetectionFrame() {
     body.updateJoints(pose, state.singlePoseDetection.minPartConfidence);
     DetectionService.outputPoseInVideo(pose, videoSource);
     BarService.createBarChart(pose.keypoints);
+
+    if (!DetectionService.isWebCamDetection()) {
+        VisorService.showConfusion(pose.keypoints);
+    }
+
     controls.update();
     render();
     setTimeout(() => {
