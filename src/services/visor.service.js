@@ -44,8 +44,15 @@ export default class VisorService {
         });
     }
 
-    static showConfusion(keypoints) {
-        
+    static showTable(keypoints) {
+        const headers = ["Part", "Score"];
+        const surface = {name: "Table", tab: "Charts"};
+
+        let values = [];
+        for (let keypoint of keypoints) {
+            values.push([keypoint.part, keypoint.score]);
+        }
+        tfvis.render.table(surface, {headers, values});
     }
 
 }

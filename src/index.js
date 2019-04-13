@@ -97,7 +97,7 @@ async function poseDetectionFrame() {
     BarService.createBarChart(pose.keypoints);
 
     if (!DetectionService.isWebCamDetection()) {
-        VisorService.showConfusion(pose.keypoints);
+        VisorService.showTable(pose.keypoints);
     }
 
     controls.update();
