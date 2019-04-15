@@ -46,7 +46,7 @@ export default class VisorService {
 
     static showTable(keypoints) {
         const headers = ["Part", "Score"];
-        const surface = {name: "Table", tab: "Charts"};
+        const surface = {name: "Parts Score Accuracy", tab: "Accuracy"};
 
         let values = [];
         for (let keypoint of keypoints) {

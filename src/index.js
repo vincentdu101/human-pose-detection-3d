@@ -13,6 +13,7 @@ import Body from "./models/Body";
 import * as models from "./data/sample-models.json";
 import * as posenet from "@tensorflow-models/posenet";
 import testVideoSrc from "./videos/photographer.mp4"; 
+import * as tf from "@tensorflow/tfjs";
 
 let upKey = 83;
 let downKey = 87;
