@@ -49,6 +49,10 @@ export default class Body {
         this.updatePartRotation = (part, positionProp, rotation) => {
             this.parts[part].rotation[positionProp] = rotation;
         }
+
+        this.getPart = (part) => {
+            return this.parts[part];
+        }
     
         this.getPartRotation = (part, positionProp) => {
             return this.parts[part].rotation[positionProp];
@@ -118,6 +122,7 @@ export default class Body {
                 }
             }
         }
+
     }
 
 }

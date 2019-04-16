@@ -11,9 +11,9 @@ import VisorService from "./services/visor.service";
 import State from "./models/State";
 import Body from "./models/Body";
 import * as models from "./data/sample-models.json";
-import * as posenet from "@tensorflow-models/posenet";
-import testVideoSrc from "./videos/photographer.mp4"; 
-import * as tf from "@tensorflow/tfjs";
+// import * as posenet from "@tensorflow-models/posenet";
+// import testVideoSrc from "./videos/photographer.mp4"; 
+import ShapeService from "./services/shape.service";
 
 let upKey = 83;
 let downKey = 87;
@@ -70,14 +70,17 @@ camera.position.x = 1000;
 camera.position.y = 50;
 camera.position.z = 1500;
 
+ShapeService.makeBoxShape(scene);
+
 camera.lookAt(scene.position);
+window.camera = camera;
 controls.addEventListener("change", render);
 document.body.addEventListener("keydown", onKeyDown, false);
 
 async function poseDetectionFrame() {   
     let frameDelay = 1000 / 30;
     let state = State.defaultState();
-    let net = await posenet.load();
+    // let net = await posenet.load();
     let imageScaleFactor = state.input.imageScaleFactor;
     let flipHorizontal = true;
     let outputStride = state.input.outputStride;
@@ -88,24 +91,27 @@ async function poseDetectionFrame() {
         testVideo.play();
     }
 
-    let pose = await net.estimateSinglePose(
-        videoSource, imageScaleFactor, flipHorizontal, outputStride
-    );
-    
-    body.updatePartsPositions(pose.keypoints);
-    body.updateJoints(pose, state.singlePoseDetection.minPartConfidence);
-    DetectionService.outputPoseInVideo(pose, videoSource);
-    BarService.createBarChart(pose.keypoints);
+    ShapeService.moveShapesToTarget(models["target-position"], scene);
+    ShapeService.didCollisionOccur(body.getPart("nose"));
 
-    if (!DetectionService.isWebCamDetection()) {
-        VisorService.showTable(pose.keypoints);
-    }
+    // let pose = await net.estimateSinglePose(
+    //     videoSource, imageScaleFactor, flipHorizontal, outputStride
+    // );
+    
+    // body.updatePartsPositions(pose.keypoints);
+    // body.updateJoints(pose, state.singlePoseDetection.minPartConfidence);
+    // DetectionService.outputPoseInVideo(pose, videoSource);
+    // BarService.createBarChart(pose.keypoints);
+
+    // if (!DetectionService.isWebCamDetection()) {
+    //     VisorService.showTable(pose.keypoints);
+    // }
 
     controls.update();
     render();
-    setTimeout(() => {
+    // setTimeout(() => {
         requestAnimationFrame(poseDetectionFrame);
-    }, frameDelay);
+    // }, frameDelay);
 }
 
 
