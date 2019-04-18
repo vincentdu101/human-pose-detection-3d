@@ -5,7 +5,7 @@ export default class State {
             algorithm: "multi-pose",
             input: {
               mobileNetArchitecture: false ? "0.50" : "0.75",
-              outputStride: 16,
+              outputStride: 32,
               imageScaleFactor: 0.5,
             },
             singlePoseDetection: {
