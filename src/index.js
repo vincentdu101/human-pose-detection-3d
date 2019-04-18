@@ -71,6 +71,11 @@ camera.position.y = 50;
 camera.position.z = 1500;
 
 ShapeService.makeBoxShape(scene);
+ShapeService.makeBoxShape(scene);
+ShapeService.makeBoxShape(scene);
+ShapeService.makeBoxShape(scene);
+ShapeService.makeBoxShape(scene);
+ShapeService.makeBoxShape(scene);
 
 camera.lookAt(scene.position);
 window.camera = camera;
