@@ -12,7 +12,7 @@ import State from "./models/State";
 import Body from "./models/Body";
 import * as models from "./data/sample-models.json";
 import * as posenet from "@tensorflow-models/posenet";
-// import testVideoSrc from "./videos/photographer.mp4"; 
+import testVideoSrc from "./videos/photographer.mp4"; 
 import ShapeService from "./services/shape.service";
 import GameService from "./services/game.service";
 
@@ -70,8 +70,8 @@ VisorService.setupVisor();
 camera.position.x = 1000;
 camera.position.y = 50;
 camera.position.z = 1500;
-
 camera.lookAt(scene.position);
+
 window.camera = camera;
 controls.addEventListener("change", render);
 document.body.addEventListener("keydown", onKeyDown, false);
@@ -132,20 +132,26 @@ async function poseDetectionFrame() {
     if (!DetectionService.isWebCamDetection()) {
         videoSource = testVideo;
         testVideo.play();
-    }
-
-    if (GameService.hasGameStarted()) {
-        ShapeService.moveShapesToTarget(models["target-position"], scene);
-        ShapeService.didCollisionOccur(body.getPart("nose"));
-        ShapeService.didCollisionOccur(body.getPart("leftShoulder"));
-        ShapeService.didCollisionOccur(body.getPart("rightShoulder"));
+    } 
+    
+    if (GameService.hasGameStarted() || !DetectionService.isWebCamDetection()) {
+        
+        if (GameService.hasGameStarted()) {
+            ShapeService.moveShapesToTarget(models["target-position"], scene);
+            ShapeService.didCollisionOccur(body.getPart("nose"));
+            ShapeService.didCollisionOccur(body.getPart("leftShoulder"));
+            ShapeService.didCollisionOccur(body.getPart("rightShoulder"));
+        }
     
         let pose = await net.estimateSinglePose(
             videoSource, imageScaleFactor, flipHorizontal, outputStride
         );
         
-        body.updatePartsPositions(pose.keypoints);
-        body.updateJoints(pose, state.singlePoseDetection.minPartConfidence);
+        if (GameService.hasGameStarted()) {
+            body.updatePartsPositions(pose.keypoints);
+            body.updateJoints(pose, state.singlePoseDetection.minPartConfidence);
+        }
+        
         DetectionService.outputPoseInVideo(pose, videoSource);
         BarService.createBarChart(pose.keypoints);
     

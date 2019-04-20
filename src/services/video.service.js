@@ -46,8 +46,8 @@ export default class VideoService {
 
     static setupVideo() {
         const video = document.getElementById("video-test-source");
-        // video.width = this.getVideoWidth();
-        // video.height = this.getVideoHeight();
+        video.width = this.getVideoWidth();
+        video.height = this.getVideoHeight();
 
         return new Promise((resolve) => {
             // video.onloadedmetadata = () => {
