@@ -14,6 +14,7 @@ import * as models from "./data/sample-models.json";
 import * as posenet from "@tensorflow-models/posenet";
 // import testVideoSrc from "./videos/photographer.mp4"; 
 import ShapeService from "./services/shape.service";
+import GameService from "./services/game.service";
 
 let upKey = 83;
 let downKey = 87;
@@ -70,17 +71,20 @@ camera.position.x = 1000;
 camera.position.y = 50;
 camera.position.z = 1500;
 
-ShapeService.makeBoxShape(scene);
-ShapeService.makeBoxShape(scene);
-ShapeService.makeBoxShape(scene);
-ShapeService.makeBoxShape(scene);
-ShapeService.makeBoxShape(scene);
-ShapeService.makeBoxShape(scene);
-
 camera.lookAt(scene.position);
 window.camera = camera;
 controls.addEventListener("change", render);
 document.body.addEventListener("keydown", onKeyDown, false);
+document.querySelector("#start-game").addEventListener("click", () => {
+    GameService.startGame();
+    ShapeService.makeBoxes(scene);
+}); 
+
+document.querySelector("#stop-game").addEventListener("click", () => {
+    resetGameState();
+    alert("Game Stopped, play again!");
+}); 
+
 
 let net; 
 
@@ -98,40 +102,63 @@ posenet.load().then((value) => {
     }
 });
 
+function updateGameInfo() {
+    console.log(GameService.getLives());
+    document.querySelector(".lives-left").textContent = "Lives: " + GameService.getLives();
+    document.querySelector(".timer-left").textContent = "Time Left in Round: " + GameService.getTimeLeft();
+}
+
+function resetGameState() {
+    GameService.stopGame();
+    ShapeService.removeAllShapes(scene);
+    updateGameInfo();
+}
+
 async function poseDetectionFrame() {   
-    let frameDelay = 1000 / 30;
     let state = State.defaultState();
     let imageScaleFactor = state.input.imageScaleFactor;
     let flipHorizontal = true;
     let outputStride = state.input.outputStride;
     let videoSource = video;
+
+    if (GameService.getLives() === 0) {
+        resetGameState();
+        alert("GAME OVER! You got hit too many times, try again!");
+    } else if (GameService.getTimeLeft() === 0) {
+        resetGameState();
+        alert("You survived the round, you won!");
+    }
     
     if (!DetectionService.isWebCamDetection()) {
         videoSource = testVideo;
         testVideo.play();
     }
 
-    ShapeService.moveShapesToTarget(models["target-position"], scene);
-    ShapeService.didCollisionOccur(body.getPart("nose"));
-
-    let pose = await net.estimateSinglePose(
-        videoSource, imageScaleFactor, flipHorizontal, outputStride
-    );
+    if (GameService.hasGameStarted()) {
+        ShapeService.moveShapesToTarget(models["target-position"], scene);
+        ShapeService.didCollisionOccur(body.getPart("nose"));
+        ShapeService.didCollisionOccur(body.getPart("leftShoulder"));
+        ShapeService.didCollisionOccur(body.getPart("rightShoulder"));
     
-    body.updatePartsPositions(pose.keypoints);
-    body.updateJoints(pose, state.singlePoseDetection.minPartConfidence);
-    DetectionService.outputPoseInVideo(pose, videoSource);
-    BarService.createBarChart(pose.keypoints);
+        let pose = await net.estimateSinglePose(
+            videoSource, imageScaleFactor, flipHorizontal, outputStride
+        );
+        
+        body.updatePartsPositions(pose.keypoints);
+        body.updateJoints(pose, state.singlePoseDetection.minPartConfidence);
+        DetectionService.outputPoseInVideo(pose, videoSource);
+        BarService.createBarChart(pose.keypoints);
+    
+        if (!DetectionService.isWebCamDetection()) {
+            VisorService.showTable(pose.keypoints);
+        }
 
-    if (!DetectionService.isWebCamDetection()) {
-        VisorService.showTable(pose.keypoints);
+        updateGameInfo();
     }
 
     controls.update();
     render();
-    // setTimeout(() => {
-        requestAnimationFrame(poseDetectionFrame);
-    // }, frameDelay);
+    requestAnimationFrame(poseDetectionFrame);
 }
 
 

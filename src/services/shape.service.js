@@ -1,7 +1,9 @@
 import * as THREE from "three";
 import MaterialService from "./material.service";
+import GameService from "./game.service";
 
 let shapes = [];
+let speed = 25;
 
 export default class ShapeService {
 
@@ -18,6 +20,7 @@ export default class ShapeService {
 
     static moveShapesToTarget(target, scene) {
         let buffer = 6;
+        target.x = Math.random(100) * 100;
 
         for (let i = 0; i < shapes.length; i++) {
             let shape = shapes[i];
@@ -29,8 +32,8 @@ export default class ShapeService {
                 scene.remove(shape);
                 return;
             } else {
-                let xDirection = (shape.position.x + buffer) - target.x > 0 ? -5 : 5;
-                let zDirection = (shape.position.z + buffer) - target.z > 0 ? -5 : 5;
+                let xDirection = (shape.position.x + buffer) - target.x > 0 ? -speed : speed;
+                let zDirection = (shape.position.z + buffer) - target.z > 0 ? -speed : speed;
                 
                 shapes[i].position.x += xDirection;
                 shapes[i].position.z += zDirection;
@@ -47,9 +50,26 @@ export default class ShapeService {
             let collisionResults = ray.intersectObjects(shapes);
             
             if (collisionResults.length > 0 && collisionResults[0].distance < directionVector.length()) {
-                console.log("HIT HIT HIT");
+                GameService.hitOccurred();
             }
         }
+    }
+
+    static removeAllShapes(scene) {
+        for (let shape of shapes) {
+            scene.remove(shape);
+        }
+        shapes = [];
+    }
+
+    static makeBoxes(scene) {
+        let interval = setInterval(() => {
+            if (GameService.hasGameStarted()) {
+                ShapeService.makeBoxShape(scene);
+            } else {
+                clearInterval(interval);
+            }
+        }, 3000);
     }
 
 }

@@ -6,11 +6,11 @@ import grass from "../images/grasslight-big.jpg";
 export default class EnvironmentService {
 
     static getWidth() {
-        return 500;
+        return 640;
     }
 
     static getHeight() {
-        return 300;
+        return 360;
     }
 
     static setupNewScene() {

@@ -28,7 +28,7 @@ export default class Body {
         }
 
         this.createSphereShape = () => {
-            let radius = 10;
+            let radius = 12;
             let widthSegments = 32;
             let heightSegments = 32;
             return new THREE.SphereGeometry(radius, widthSegments, heightSegments);
