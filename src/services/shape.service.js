@@ -50,7 +50,9 @@ export default class ShapeService {
             let collisionResults = ray.intersectObjects(shapes);
             
             if (collisionResults.length > 0 && collisionResults[0].distance < directionVector.length()) {
+                console.log("hit");
                 GameService.hitOccurred();
+                break;
             }
         }
     }

@@ -66,10 +66,6 @@ for (let part of models["default-model"]) {
 body.resetSegments();
 window.body = body;
 VisorService.setupVisor();
-
-camera.position.x = 1000;
-camera.position.y = 50;
-camera.position.z = 1500;
 camera.lookAt(scene.position);
 
 window.camera = camera;
@@ -106,6 +102,10 @@ function trackCollisionDetection() {
         ShapeService.didCollisionOccur(body.getPart("nose"));
         ShapeService.didCollisionOccur(body.getPart("leftShoulder"));
         ShapeService.didCollisionOccur(body.getPart("rightShoulder"));
+        ShapeService.didCollisionOccur(body.getPart("leftEye"));
+        ShapeService.didCollisionOccur(body.getPart("rightEye"));
+        ShapeService.didCollisionOccur(body.getPart("leftEar"));
+        ShapeService.didCollisionOccur(body.getPart("rightEar"));
     }
 }
 

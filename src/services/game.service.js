@@ -37,7 +37,7 @@ export default class GameService {
     }
 
     static getTimeLeft() {
-        return !timer ? startingTimer : timer;
+        return timer;
     }
 
     static getLives() {

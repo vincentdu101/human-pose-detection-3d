@@ -28,9 +28,14 @@ export default class EnvironmentService {
         let near = 1;
         let far = 10000;
 
-        return new THREE.PerspectiveCamera (
+        let camera = new THREE.PerspectiveCamera (
             fieldOfView, aspect, near, far
         );
+
+        camera.position.x = 1000;
+        camera.position.y = 50;
+        camera.position.z = 1500;
+        return camera;
     }
 
     static setupNewRenderer() {
@@ -56,8 +61,8 @@ export default class EnvironmentService {
         controls.rotateSpeed = 1.0;
         controls.zoomSpeed = 1.2;
         controls.panSpeed = 0.8;
-        controls.noZoom = false;
-        controls.noPan = false;
+        controls.noZoom = true;
+        controls.noPan = true;
         controls.staticMoving = true;
         controls.dynamicDampingFactor = 0.3;
         controls.keys = [ 65, 83, 68 ];
