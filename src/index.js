@@ -75,9 +75,11 @@ camera.lookAt(scene.position);
 window.camera = camera;
 controls.addEventListener("change", render);
 document.body.addEventListener("keydown", onKeyDown, false);
+document.querySelector("#hide-visor").style.display = "none"
 document.querySelector("#start-game").addEventListener("click", () => {
     GameService.startGame();
     ShapeService.makeBoxes(scene);
+    document.querySelector("#show-visor").style.display = "none";
 }); 
 
 document.querySelector("#stop-game").addEventListener("click", () => {
@@ -86,41 +88,35 @@ document.querySelector("#stop-game").addEventListener("click", () => {
 }); 
 
 
-let net; 
-
-posenet.load().then((value) => {
-    net = value;
-    // create video webcam
-    try {
-        Promise.all([VideoService.loadWebcam(), VideoService.loadVideo()]).then((videos) => {
-            video = videos[0];
-            testVideo = videos[1];
-            poseDetectionFrame();
-        });
-    } catch (e) {
-        throw e;
-    }
-});
-
 function updateGameInfo() {
-    console.log(GameService.getLives());
     document.querySelector(".lives-left").textContent = "Lives: " + GameService.getLives();
     document.querySelector(".timer-left").textContent = "Time Left in Round: " + GameService.getTimeLeft();
 }
 
 function resetGameState() {
+    document.querySelector("#show-visor").style.display = "";
     GameService.stopGame();
     ShapeService.removeAllShapes(scene);
     updateGameInfo();
 }
 
-async function poseDetectionFrame() {   
-    let state = State.defaultState();
-    let imageScaleFactor = state.input.imageScaleFactor;
-    let flipHorizontal = true;
-    let outputStride = state.input.outputStride;
-    let videoSource = video;
+function trackCollisionDetection() {
+    if (GameService.hasGameStarted()) {
+        ShapeService.moveShapesToTarget(models["target-position"], scene);
+        ShapeService.didCollisionOccur(body.getPart("nose"));
+        ShapeService.didCollisionOccur(body.getPart("leftShoulder"));
+        ShapeService.didCollisionOccur(body.getPart("rightShoulder"));
+    }
+}
 
+function updateBodyPositions(pose, state) {
+    if (GameService.hasGameStarted()) {
+        body.updatePartsPositions(pose.keypoints);
+        body.updateJoints(pose, state.singlePoseDetection.minPartConfidence);
+    }
+}
+
+function notifyGameMessages() {
     if (GameService.getLives() === 0) {
         resetGameState();
         alert("GAME OVER! You got hit too many times, try again!");
@@ -128,48 +124,18 @@ async function poseDetectionFrame() {
         resetGameState();
         alert("You survived the round, you won!");
     }
-    
-    if (!DetectionService.isWebCamDetection()) {
-        videoSource = testVideo;
-        testVideo.play();
-    } 
-    
-    if (GameService.hasGameStarted() || !DetectionService.isWebCamDetection()) {
-        
-        if (GameService.hasGameStarted()) {
-            ShapeService.moveShapesToTarget(models["target-position"], scene);
-            ShapeService.didCollisionOccur(body.getPart("nose"));
-            ShapeService.didCollisionOccur(body.getPart("leftShoulder"));
-            ShapeService.didCollisionOccur(body.getPart("rightShoulder"));
-        }
-    
-        let pose = await net.estimateSinglePose(
-            videoSource, imageScaleFactor, flipHorizontal, outputStride
-        );
-        
-        if (GameService.hasGameStarted()) {
-            body.updatePartsPositions(pose.keypoints);
-            body.updateJoints(pose, state.singlePoseDetection.minPartConfidence);
-        }
-        
-        DetectionService.outputPoseInVideo(pose, videoSource);
-        BarService.createBarChart(pose.keypoints);
-    
-        if (!DetectionService.isWebCamDetection()) {
-            VisorService.showTable(pose.keypoints);
-        }
-
-        updateGameInfo();
-    }
-
-    controls.update();
-    render();
-    requestAnimationFrame(poseDetectionFrame);
 }
 
+function updatePerFrameUpdates(state, videoSource, pose) {
+    trackCollisionDetection();
+    updateBodyPositions(pose, state);
+    DetectionService.outputPoseInVideo(pose, videoSource);
+    BarService.createBarChart(pose.keypoints);
+    VisorService.showTable(pose.keypoints);
+    updateGameInfo();
+}
 
 function render() {
-    let timer = 0.002 * Date.now();
     renderer.render(scene, camera);
 }
 
@@ -191,3 +157,43 @@ function onKeyDown(event) {
     }
 }
 
+async function poseDetectionFrame() {   
+    let state = State.defaultState();
+    let videoSource = video;
+    let imageScaleFactor = state.input.imageScaleFactor;
+    let flipHorizontal = true;
+    let outputStride = state.input.outputStride;
+
+    notifyGameMessages();    
+    if (!DetectionService.isWebCamDetection()) {
+        videoSource = testVideo;
+        testVideo.play();
+    } 
+    
+    if (GameService.hasGameStarted() || !DetectionService.isWebCamDetection()) {     
+        let pose = await net.estimateSinglePose(
+            videoSource, imageScaleFactor, flipHorizontal, outputStride
+        );
+        updatePerFrameUpdates(state, videoSource, pose);
+    }
+
+    controls.update();
+    render();
+    requestAnimationFrame(poseDetectionFrame);
+}
+
+let net; 
+
+posenet.load().then((value) => {
+    net = value;
+    // create video webcam
+    try {
+        Promise.all([VideoService.loadWebcam(), VideoService.loadVideo()]).then((videos) => {
+            video = videos[0];
+            testVideo = videos[1];
+            poseDetectionFrame();
+        });
+    } catch (e) {
+        throw e;
+    }
+});

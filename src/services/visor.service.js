@@ -7,7 +7,7 @@ export default class VisorService {
         document.querySelector("#show-visor").addEventListener("click", () => {
             const visorInstance = tfvis.visor();
             this.toggleMainViewComponents("none");
-            this.toggleTestVideo("block");
+            this.toggleTestVideo("");
             this.addHideListener();
             sessionStorage.setItem("detection-type", "video");
 
@@ -15,12 +15,15 @@ export default class VisorService {
                 visorInstance.toggle();
             }
         }); 
+
+        document.querySelector("#hide-visor").addEventListener("click", () => {
+            const visorInstance = tfvis.visor();
+            visorInstance.toggle();
+            this.stopTestMode();
+        });
     }
 
     static setupVideoTab() {
-        tfvis.visor().surface({
-            name: "Video Test Tab"
-        });
         const visorInstance = tfvis.visor();
         sessionStorage.setItem("detection-type", "webcam");
         visorInstance.close();
@@ -29,19 +32,28 @@ export default class VisorService {
     static toggleMainViewComponents(style) {
         document.querySelector("#world").style.display = style;
         document.querySelector("#main").style.display = style;
-        document.querySelector(".bar-chart").style.display = style;
+        document.querySelector("#start-game").style.display = style;
+        document.querySelector("#stop-game").style.display = style;
+        document.querySelector("#show-visor").style.display = style;
+        document.querySelector(".lives-left").style.display = style;
+        document.querySelector(".timer-left").style.display = style;
     }
 
     static toggleTestVideo(style) {
         document.querySelector("#test-video").style.display = style;
+        document.querySelector("#hide-visor").style.display = style;
     }
 
     static addHideListener() {
         document.querySelector(".css-omocl").addEventListener("click", () => {
-            this.toggleMainViewComponents("block");
-            this.toggleTestVideo("none");
-            sessionStorage.setItem("detection-type", "webcam");
+            this.stopTestMode();
         });
+    }
+
+    static stopTestMode() {
+        this.toggleMainViewComponents("");
+        this.toggleTestVideo("none");
+        sessionStorage.setItem("detection-type", "webcam");
     }
 
     static showTable(keypoints) {

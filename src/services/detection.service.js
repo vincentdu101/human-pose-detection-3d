@@ -3,15 +3,13 @@ import State from "../models/State";
 import VideoService from "./video.service";
 import * as d3 from "d3";
 
-const color = "aqua";
+const colors = {"light": "aqua", "dark": "blue"};
 const scale = 1;
 const lineWidth = 2;
 const state = State.defaultState();
 const width = VideoService.getVideoWidth();
 const height = VideoService.getVideoHeight();
 const margin = {top: 20, right: 10, bottom: 30, left: 30};
-
-let detectionType = "webcam";
 
 function toTuple({y, x}) {
     return [y, x];
@@ -35,7 +33,8 @@ export default class DetectionService {
         context.stroke();
     }
 
-    static drawSkeleton(keypoints, minPartConfidence, context) {
+    static drawSkeleton(keypoints, minPartConfidence, context, mode) {
+        const color = colors[mode];
         const adjkeyPoints = posenet.getAdjacentKeyPoints(keypoints, minPartConfidence);
 
         adjkeyPoints.forEach((keypoints) => {
@@ -45,7 +44,8 @@ export default class DetectionService {
         });
     }
 
-    static drawKeypoints(keypoints, minPartConfidence, ctx) {
+    static drawKeypoints(keypoints, minPartConfidence, ctx, mode) {
+        const color = colors[mode];
         for (let i = 0; i < keypoints.length; i++) {
             const keypoint = keypoints[i];
 
@@ -58,11 +58,11 @@ export default class DetectionService {
         }
     }
 
-    static drawPose(pose, context) {
+    static drawPose(pose, context, mode) {
         if (pose.score >= state.singlePoseDetection.minPoseConfidence) {
             let minPartConfidence = state.singlePoseDetection.minPartConfidence;
-            this.drawKeypoints(pose.keypoints, minPartConfidence, context);
-            this.drawSkeleton(pose.keypoints, minPartConfidence, context);
+            this.drawKeypoints(pose.keypoints, minPartConfidence, context, mode);
+            this.drawSkeleton(pose.keypoints, minPartConfidence, context, mode);
         }
     }
 
@@ -124,7 +124,7 @@ export default class DetectionService {
         canvas.height = height;
         
         this.updateContext(context);
-        this.drawPose(pose, context);
+        this.drawPose(pose, context, "dark");
 
         this.drawAxes();
     }
@@ -138,7 +138,7 @@ export default class DetectionService {
         canvas.height = height;
 
         this.updateContext(context, video);
-        this.drawPose(pose, context);
+        this.drawPose(pose, context, "light");
     }
 
     static outputVideoBasedSkeleton(keypoints, output, scale = 1) {
@@ -166,7 +166,8 @@ export default class DetectionService {
             const videoTest = "video-test-output";
             const canvas = document.getElementById(videoTest);
             const ctx = canvas.getContext("2d");
-
+            
+            this.outputPureSkeleton(pose, "skeleton-test-output");
             this.drawKeypoints(pose.keypoints, state.singlePoseDetection.minPartConfidence, ctx);
             this.outputVideoSkeleton(pose, video, videoTest);             
             this.outputVideoBasedSkeleton(pose.keypoints, videoTest);
