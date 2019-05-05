@@ -25,8 +25,7 @@
     "three-orbitcontrols-ts": "^0.1.2",
     "three-trackballcontrols": "^0.0.7",
     "tsc-loader": "^1.0.4",
-    "webpack-dev-middleware": "^3.6.0",
-    "webpack-dev-server": "^3.2.0"
+    "webpack-dev-middleware": "^3.6.0"
   },
   "devDependencies": {
     "@babel/core": "^7.3.4",
@@ -40,6 +39,7 @@
     "ts-loader": "^5.3.3",
     "typescript": "^3.3.3333",
     "webpack": "^4.29.5",
-    "webpack-cli": "^3.2.3"
+    "webpack-cli": "^3.2.3",
+    "webpack-dev-server": "^3.3.1"
   }
 }
